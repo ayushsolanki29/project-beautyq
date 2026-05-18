@@ -30,8 +30,18 @@
                     <td>{{ appt.time|time:"H:i" }}</td>
                     <td>{{ appt.created_at|date:"M d, H:i" }}</td>
                     <td>
-                        <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Confirm</a>
-                        <a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Decline</a>
+                        <form method="post" action="{% url 'confirm_appointment' appt.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-success">
+                                <i class="fas fa-check"></i> Confirm
+                            </button>
+                        </form>
+                        <form method="post" action="{% url 'decline_appointment' appt.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="fas fa-times"></i> Decline
+                            </button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}

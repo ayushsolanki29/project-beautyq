@@ -4,7 +4,7 @@ from django.forms import ModelForm, DateInput, TimeInput
 from .models import Staff, DutyRoster
 from django.views.generic import ListView
 from django.utils import timezone
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, DetailView
 from .models import Appointment
 from .models import Service
@@ -17,6 +17,8 @@ from django.db.models import Sum, Q
 from decimal import Decimal
 from .models import Beautician, Appointment, Service, DutyRoster, PayoutPeriod, Payout
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 
 def dashboard(request):
     today = timezone.now().date()
@@ -35,13 +37,59 @@ def dashboard(request):
     }
     return render(request, "parlour/parlour-dashboard/dashboard.html", context)
 
-class NewRequestsView( ListView):
+class OwnerOrStaffRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        user = self.request.user
+        return user.is_authenticated and (user.is_staff or user.is_superuser or user.parlours.exists())
+
+    def handle_no_permission(self):
+        messages.error(self.request, "You don't have permission to view this page.")
+        return redirect('login')
+
+
+class NewRequestsView(LoginRequiredMixin, OwnerOrStaffRequiredMixin, ListView):
     model = Appointment
     template_name = 'parlour/appointments/new_requests.html'
     context_object_name = 'appointments'
 
     def get_queryset(self):
         return Appointment.objects.filter(status='pending').order_by('date', 'time')
+
+
+@login_required
+@require_POST
+def confirm_appointment(request, appointment_id):
+    if not (request.user.is_staff or request.user.is_superuser or request.user.parlours.exists()):
+        messages.error(request, "You don't have permission to approve appointments.")
+        return redirect('new_requests')
+
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    if appointment.status != 'pending':
+        messages.info(request, 'This appointment is no longer pending.')
+        return redirect('new_requests')
+
+    appointment.status = 'confirmed'
+    appointment.save(update_fields=['status'])
+    messages.success(request, 'Appointment confirmed.')
+    return redirect('new_requests')
+
+
+@login_required
+@require_POST
+def decline_appointment(request, appointment_id):
+    if not (request.user.is_staff or request.user.is_superuser or request.user.parlours.exists()):
+        messages.error(request, "You don't have permission to decline appointments.")
+        return redirect('new_requests')
+
+    appointment = get_object_or_404(Appointment, pk=appointment_id)
+    if appointment.status != 'pending':
+        messages.info(request, 'This appointment is no longer pending.')
+        return redirect('new_requests')
+
+    appointment.status = 'cancelled'
+    appointment.save(update_fields=['status'])
+    messages.success(request, 'Appointment declined.')
+    return redirect('new_requests')
 
 class TodayScheduleView( ListView):
     model = Appointment
