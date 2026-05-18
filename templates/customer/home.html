@@ -1,0 +1,106 @@
+{% extends 'customer/base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<section class="hero-section text-center">
+    <span class="feature-badge mb-3 d-inline-block"><i class="fa-solid fa-sparkles"></i> AI-Powered Salon Booking</span>
+    <h1 class="mb-3">Book Your Beauty Experience</h1>
+    <p class="lead mb-4 opacity-90">Discover services, packages and promos. Book instantly with secure Stripe payments.</p>
+    
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+        <a href="{% url 'book_appointment' %}" class="btn btn-light btn-lg px-4 fw-bold">Book Appointment</a>
+        <a href="{% url 'ai_advisor' %}" class="btn btn-outline-light btn-lg px-4">AI Beauty Advisor</a>
+    </div>
+    <p class="mt-4 mb-0 small opacity-75">{{ total_bookings }}+ appointments managed on BeautyQ</p>
+</section>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card service-card h-100 p-4 text-center">
+            <i class="fa-solid fa-calendar-check fa-2x text-danger mb-3"></i>
+            <h5>Real-Time Booking</h5>
+            <p class="text-muted small mb-0">View staff availability and secure your slot instantly.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card service-card h-100 p-4 text-center">
+            <i class="fa-solid fa-bell fa-2x text-danger mb-3"></i>
+            <h5>Turn Notifications</h5>
+            <p class="text-muted small mb-0">Get alerted when your salon turn is approaching.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        
+        <div class="card service-card h-100 p-4 text-center">
+            <i class="fa-solid fa-credit-card fa-2x text-danger mb-3"></i>
+            <h5>Secure Payments</h5>
+            <p class="text-muted small mb-0">Pay safely with Stripe at checkout.</p>
+        </div>
+    </div>
+</div>
+
+<h3 class="fw-bold mb-3">Popular Services</h3>
+<div class="row g-4 mb-4">
+    {% for service in services %}
+    <div class="col-md-3 col-sm-6">
+        <div class="card service-card h-100">
+            {% if service.image %}
+            <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.name }}" style="height:140px;object-fit:cover;">
+            {% else %}
+            <div class="bg-light text-center py-5"><i class="fa-solid fa-scissors fa-2x text-muted"></i></div>
+            {% endif %}
+            <div class="card-body">
+                <h6 class="fw-bold">{{ service.name }}</h6>
+                <p class="text-muted small mb-2">{{ service.category|title }} - {{ service.duration }} min</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-danger">Rs.{{ service.price }}</span>
+                    <a href="{% url 'book_appointment' %}" class="btn btn-beauty btn-sm">Book</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No services yet. Parlour owners can add services from the dashboard.</p>
+    {% endfor %}
+</div>
+<a href="{% url 'services_catalog' %}" class="btn btn-outline-beauty mb-5">View All Services</a>
+
+{% if packages %}
+<h3 class="fw-bold mb-3">Service Packages</h3>
+<div class="row g-4 mb-5">
+    {% for pkg in packages %}
+    <div class="col-md-6">
+        <div class="card service-card p-4">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <h5 class="fw-bold">{{ pkg.name }}</h5>
+                    <p class="text-muted small">{{ pkg.description|truncatewords:15 }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-danger">{{ pkg.discount_percentage }}% OFF</span>
+                    
+                    <div class="fw-bold text-danger mt-2">Rs.{{ pkg.package_price }}</div>
+                    <small class="text-muted text-decoration-line-through">Rs.{{ pkg.original_price }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if parlours %}
+<h3 class="fw-bold mb-3">Partner Salons</h3>
+<div class="row g-3 mb-4">
+    {% for p in parlours %}
+    <div class="col-md-4">
+        <div class="card service-card p-3">
+            <h6 class="fw-bold mb-1"><i class="fa-solid fa-store text-danger"></i> {{ p.name }}</h6>
+            <p class="text-muted small mb-0">{{ p.address|truncatewords:12 }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

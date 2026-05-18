@@ -1,0 +1,130 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb bg-transparent p-0" style="font-size: 13px;">
+    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item text-muted">Finance & Payouts</li>
+    <li class="breadcrumb-item active fw-semibold text-dark" aria-current="page">Payout Manifest</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1" style="color: #08142f;">Vendor Payout Dispatch System</h2>
+    <p class="text-muted small mb-0">Track calculated net earnings, verify processed transfers, and settle pending salon vendor balances.</p>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="chart-container-wrapper p-4 bg-white border rounded shadow-sm mb-5">
+    <h5 class="fw-bold mb-3" style="color: #08142f;">Active Vendor Ledgers</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Parlour Details</th>
+                    <th>Gross Sales Volume</th>
+                    <th>Net Earning (After Commission)</th>
+                    <th>Total Disbursed</th>
+                    <th>Outstanding Balance</th>
+                    <th class="text-end px-4">Action Settlement</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in payout_records %}
+                <tr>
+                    <td class="fw-bold" style="color: #08142f;">{{ item.parlour.name }}</td>
+                    <td>₹{{ item.gross_volume|floatformat:2 }}</td>
+                    <td class="text-success fw-semibold">₹{{ item.total_earning|floatformat:2 }}</td>
+                    <td class="text-primary">₹{{ item.total_paid|floatformat:2 }}</td>
+                    <td>
+                        {% if item.balance > 0 %}
+                            <span class="text-danger fw-bold">₹{{ item.balance|floatformat:2 }}</span>
+                        {% else %}
+                            <span class="text-muted">₹0.00</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end px-4">
+                        <button type="button" class="btn btn-sm btn-dark px-3" data-bs-toggle="modal" data-bs-target="#payModal{{ item.parlour.id }}" style="border-radius: 6px; font-size: 13px;">
+                            <i class="fa-solid fa-money-bill-transfer me-1"></i> Disburse Funds
+                        </button>
+                    </td>
+                </tr>
+
+                <div class="modal fade" id="payModal{{ item.parlour.id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="border-radius: 12px; border: none;">
+                            <div class="modal-header border-0 pt-4 px-4">
+                                <h5 class="modal-title fw-bold" style="color: #08142f;">Record Fund Dispatch</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form action="{% url 'release_vendor_payout' item.parlour.id %}" method="POST">
+                                {% csrf_token %}
+                                <div class="modal-body px-4 pb-4">
+                                    <p class="text-muted small mb-3">Log an external bank clearing transaction for <strong>{{ item.parlour.name }}</strong>.</p>
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold text-dark">Amount to Clear (INR)</label>
+                                        <input type="number" step="0.01" class="form-control bg-light" name="amount_to_pay" max="{{ item.balance }}" value="{{ item.balance }}" required style="height: 42px; border-radius:6px;">
+                                    </div>
+                                    <div class="mb-0">
+                                        <label class="form-label small fw-bold text-dark">Bank Reference ID / UTR Number</label>
+                                        <input type="text" class="form-control bg-light" name="transaction_reference" placeholder="e.g., UTR125489632" required style="height: 42px; border-radius:6px;">
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
+                                    <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal" style="border-radius: 8px;">Cancel</button>
+                                    <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; background-color: #3b82f6; border: none;">Confirm Clearing</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No systemic vendor data detected for payout computations.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="chart-container-wrapper p-4 bg-white border rounded shadow-sm">
+    <h5 class="fw-bold mb-3" style="color: #08142f;"><i class="fa-solid fa-clock-history me-2 text-muted"></i>Recent Clearing History Log</h5>
+    <div class="table-responsive">
+        <table class="table table-sm table-hover align-middle m-0" style="font-size: 13px;">
+            <thead class="table-light">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Beneficiary Parlour</th>
+                    <th>Disbursed Amount</th>
+                    <th>Bank Reference String Token</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr>
+                    <td>{{ txn.payment_date|date:"d M Y, h:i A" }}</td>
+                    <td class="fw-semibold">{{ txn.parlour.name }}</td>
+                    <td class="text-success fw-bold">₹{{ txn.amount|floatformat:2 }}</td>
+                    <td><code class="text-dark bg-light px-2 py-1 rounded" style="font-size: 11px;">{{ txn.transaction_reference }}</code></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-3 text-muted">No corporate historical bank clearance modifications documented yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

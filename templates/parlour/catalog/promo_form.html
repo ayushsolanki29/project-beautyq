@@ -1,0 +1,70 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-white">
+            <h4 class="mb-0">
+                {% if object %}Edit Promo Code{% else %}Create New Promo Code{% endif %}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_code" class="form-label">Promo Code *</label>
+                    {{ form.code }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_discount_type" class="form-label">Discount Type *</label>
+                        {{ form.discount_type }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_discount_value" class="form-label">Discount Value *</label>
+                        {{ form.discount_value }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_valid_from" class="form-label">Valid From *</label>
+                        {{ form.valid_from }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_valid_to" class="form-label">Valid To *</label>
+                        {{ form.valid_to }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_max_uses" class="form-label">Max Uses *</label>
+                        {{ form.max_uses }}
+                        <small class="text-muted">Total number of times this code can be used</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_min_order_amount" class="form-label">Min. Order Amount (₹)</label>
+                        {{ form.min_order_amount }}
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_active }}
+                    <label for="id_is_active" class="form-check-label">Active</label>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'all_promos' %}" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}Update{% else %}Create{% endif %} Promo Code
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

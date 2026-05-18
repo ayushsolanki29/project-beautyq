@@ -1,0 +1,128 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb bg-transparent p-0" style="font-size: 13px;">
+    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item text-muted">Finance & Payouts</li>
+    <li class="breadcrumb-item active fw-semibold text-dark" aria-current="page">Commission Matrix</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1" style="color: #08142f;">Revenue & Commission Architecture</h2>
+    <p class="text-muted small mb-0">Configure global revenue split rates, manage asymmetric vendor tier cuts, and track aggregate network margins.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Aggregate Gross Volume</small>
+            <h3 class="fw-bold m-0" style="color: #08142f;">₹{{ total_volume|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Platform Commission Revenue</small>
+            <h3 class="fw-bold m-0 text-success">Postal Cuts: ₹{{ admin_earnings|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Disbursed Vendor Holdings</small>
+            <h3 class="fw-bold m-0 text-primary">₹{{ vendor_payouts|floatformat:2 }}</h3>
+        </div>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-lg-4">
+        <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 12px; background-color: #fff;">
+            <h5 class="fw-bold mb-2" style="color: #08142f;">Global Commission Rule</h5>
+            <p class="text-muted small mb-4">Define the flat rate baseline fee cut deducted automatically from every confirmed consumer slot checkout booking transaction.</p>
+            
+            <form action="{% url 'update_global_commission' %}" method="POST">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="global_rate" class="form-label small fw-bold text-dark">Default Platform Cut (%)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light text-muted border-end-0"><i class="fa-solid fa-percent"></i></span>
+                        <input type="number" step="0.01" class="form-control bg-light border-start-0 fw-bold" id="global_rate" name="global_rate" value="{{ global_rate }}" min="0" max="100" required style="height: 45px; font-size: 16px; color: #08142f;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" style="border-radius: 8px; background-color: #3b82f6; border: none; height: 45px;">
+                    <i class="fa-solid fa-floppy-disk me-2"></i>Apply System Rate
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="chart-container-wrapper p-4 bg-white border rounded shadow-sm">
+            <h5 class="fw-bold mb-1" style="color: #08142f;">Localized Vendor Adjustments</h5>
+            <p class="text-muted small mb-4">Override system parameters for targeted partners. Leave custom field at 0.00 to keep global flat defaults intact.</p>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle m-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Parlour Brand Branch</th>
+                            <th>Active Base Setting Cut</th>
+                            <th class="text-end px-4" style="width: 240px;">Custom Tier Modification Override</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for parlour in parlours %}
+                        <tr>
+                            <td>
+                                <div>
+                                    <span class="fw-bold d-block" style="color: #08142f;">{{ parlour.name }}</span>
+                                    <small class="text-muted"><i class="fa-solid fa-user me-1 small"></i>{{ parlour.owner.username }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                {% if parlour.custom_commission and parlour.custom_commission > 0 %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1 fw-semibold" style="border-radius: 6px;">
+                                        Custom Split: {{ parlour.custom_commission }}%
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-light text-secondary border px-2 py-1 fw-normal" style="border-radius: 6px;">
+                                        System Flat default ({{ global_rate }}%)
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end px-4">
+                                <form action="{% url 'update_parlour_override' parlour.id %}" method="POST" class="d-flex align-items-center gap-2 justify-content-end">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm" style="width: 110px;">
+                                        <input type="number" step="0.01" class="form-control" name="custom_commission" value="{{ parlour.custom_commission|default:'0.00' }}" min="0" max="100" required style="border-radius: 6px 0 0 6px;">
+                                        <span class="input-group-text bg-light text-muted">%</span>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary px-2" style="border-radius: 6px;" title="Save Custom Split Override">
+                                        <i class="fa-solid fa-check"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-4 text-muted">No operational salons found inside the system backend registry modules.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

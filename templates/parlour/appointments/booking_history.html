@@ -1,0 +1,63 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <h2 class="mb-4"><i class="fa-solid fa-history me-2"></i>Booking History</h2>
+
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Beautician</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.date|date:"M d, Y" }}</td>
+                    <td>{{ appt.time|time:"H:i" }}</td>
+                    <td>
+                        <strong>{{ appt.customer_name }}</strong><br>
+                        <small>{{ appt.customer_phone }}</small>
+                    </td>
+                    <td>{{ appt.service.name }}</td>
+                    <td>{{ appt.beautician.user.get_full_name|default:"—" }}</td>
+                    <td>
+                        {% if appt.status == 'completed' %}
+                            <span class="badge bg-success">Completed</span>
+                        {% elif appt.status == 'cancelled' %}
+                            <span class="badge bg-danger">Cancelled</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if is_paginated %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info">No booking history found.</div>
+    {% endif %}
+</div>
+{% endblock %}

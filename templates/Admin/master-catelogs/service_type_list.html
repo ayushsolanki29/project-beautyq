@@ -1,0 +1,129 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb bg-transparent p-0" style="font-size: 13px;">
+    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item text-muted">Master Catalog</li>
+    <li class="breadcrumb-item active fw-semibold text-dark" aria-current="page">Service Types</li>
+  </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-1" style="color: #08142f;">Global Service Catalog</h2>
+        <p class="text-muted small mb-0">Define global specific services, bind them to master groups, and manage visibility controls.</p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-primary px-4 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#addServiceModal" style="border-radius: 8px; background-color: #3b82f6; border: none;">
+            <i class="fa-solid fa-plus me-2"></i>Add Service Type
+        </button>
+    </div>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-4" role="alert" style="border-radius: 8px;">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="chart-container-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Service Type Name</th>
+                    <th>Parent Master Category</th>
+                    <th>Scope Description</th>
+                    <th class="text-center">Status Switch</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                <tr>
+                    <td>
+                        <div>
+                            <span class="fw-bold d-block" style="color: #08142f;">{{ service.name }}</span>
+                            <small class="text-muted">Configured {{ service.created_at|date:"d M Y" }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary px-2 py-1 fs-6 fw-semibold" style="border-radius: 6px;">
+                            <i class="{{ service.category.icon_class }} me-1"></i>{{ service.category.name }}
+                        </span>
+                    </td>
+                    <td>
+                        <p class="text-muted small mb-0" style="max-width: 380px;">
+                            {{ service.description|default:"No service summary description documented." }}
+                        </p>
+                    </td>
+                    <td class="text-center">
+                        <form action="{% url 'toggle_service_status' service.id %}" method="POST" id="toggleForm{{ service.id }}">
+                            {% csrf_token %}
+                            <div class="form-check form-switch d-inline-block">
+                                <input class="form-check-input" type="checkbox" role="switch" 
+                                       id="switch{{ service.id }}" 
+                                       {% if service.is_active %}checked{% endif %}
+                                       onchange="document.getElementById('toggleForm{{ service.id }}').submit();"
+                                       style="width: 45px; height: 22px; cursor: pointer;">
+                            </div>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-muted">No specific platform sub-services populated in the directory.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
+            <div class="modal-header border-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold" id="addServiceModalLabel" style="color: #08142f; font-size: 20px;">Create Global Service Type</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <form action="{% url 'add_service_type' %}" method="POST">
+                {% csrf_token %}
+                <div class="modal-body px-4 pb-4">
+                    <p class="text-muted small mb-4">Add a specific service variant. Salons can select these items and assign localized pricing structures.</p>
+                    
+                    <div class="mb-3">
+                        <label for="service_name" class="form-label small fw-bold text-dark">Service Name</label>
+                        <input type="text" class="form-control bg-light" id="service_name" name="service_name" placeholder="e.g., Bridal Hair Styling" required style="font-size: 14px; height: 42px; border-color: #dee2e6; border-radius: 6px;">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label small fw-bold text-dark">Parent Master Category</label>
+                        <select class="form-select bg-light" id="category_id" name="category_id" required style="font-size: 14px; height: 42px; border-color: #dee2e6; border-radius: 6px;">
+                            <option value="" disabled selected>Assign to master category section...</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-0">
+                        <label for="description" class="form-label small fw-bold text-dark">Service Scope Description</label>
+                        <textarea class="form-control bg-light" id="description" name="description" rows="3" placeholder="Briefly document service definitions..." style="font-size: 14px; border-color: #dee2e6; border-radius: 6px;" ></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
+                    <button type="button" class="btn btn-light px-4 py-2" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 500;">Cancel</button>
+                    <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 8px; font-weight: 500; background-color: #3b82f6; border: none;">Save Service</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'customer/base.html' %}
+{% block title %}My Appointments{% endblock %}
+{% block content %}
+<h2 class="fw-bold mb-4">My Appointments</h2>
+{% if not user.is_authenticated %}
+<p>Please <a href="{% url 'login' %}">login</a> to view your bookings.</p>
+{% else %}
+<div class="table-responsive">
+    <table class="table table-hover bg-white rounded shadow-sm">
+        <thead class="table-light">
+            <tr>
+                <th>Service</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Payment</th>
+                <th>Queue</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appt in appointments %}
+            <tr>
+                <td class="fw-semibold">{{ appt.service.name }}</td>
+                <td>{{ appt.date }} at {{ appt.time }}</td>
+                <td><span class="badge bg-{% if appt.status == 'confirmed' %}success{% elif appt.status == 'pending' %}warning{% elif appt.status == 'completed' %}primary{% else %}secondary{% endif %}">{{ appt.status|title }}</span></td>
+                <td>{{ appt.payment_status|title }}</td>
+                <td>{% if appt.queue_position %}<span class="queue-badge">#{{ appt.queue_position }}</span>{% else %}-{% endif %}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="text-muted text-center py-4">No appointments yet. <a href="{% url 'book_appointment' %}">Book now</a></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

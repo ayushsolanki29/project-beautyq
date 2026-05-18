@@ -1,0 +1,72 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb bg-transparent p-0" style="font-size: 13px;">
+    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item text-muted">Core Security</li>
+    <li class="breadcrumb-item active fw-semibold text-dark" aria-current="page">System Audit Logs</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1" style="color: #08142f;">Security & System Audit Trails</h2>
+    <p class="text-muted small mb-0">Monitor uneditable historical modification logs, operational changes, and admin access origins.</p>
+</div>
+
+<div class="chart-container-wrapper p-4 bg-white border rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0" style="font-size: 13.5px;">
+            <thead class="table-light">
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Operator Profile</th>
+                    <th>Action Event Type</th>
+                    <th>Target Module</th>
+                    <th>Operational Description Changes Summary</th>
+                    <th>Network Source (IP)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="text-muted" style="font-size: 12.5px; white-space: nowrap;">
+                        {{ log.timestamp|date:"d M Y, h:i A" }}
+                    </td>
+                    <td class="fw-bold" style="color: #08142f;">
+                        <i class="fa-solid fa-user-shield me-1 text-secondary" style="font-size: 11px;"></i>
+                        {{ log.user.username|default:"System Engine" }}
+                    </td>
+                    <td>
+                        {% if log.action_type == 'APPROVAL' or log.action_type == 'CREATE' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="border-radius: 6px; font-size: 11px; min-width: 75px; text-center;">{{ log.action_type }}</span>
+                        {% elif log.action_type == 'UPDATE' %}
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="border-radius: 6px; font-size: 11px; min-width: 75px; text-center;">{{ log.action_type }}</span>
+                        {% else %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="border-radius: 6px; font-size: 11px; min-width: 75px; text-center;">{{ log.action_type }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="fw-semibold text-secondary">
+                        {{ log.module_affected }}
+                    </td>
+                    <td class="text-dark" style="max-width: 380px;">
+                        {{ log.description }}
+                    </td>
+                    <td>
+                        <code class="text-muted bg-light px-2 py-1 rounded" style="font-size: 11px;">{{ log.ip_address|default:"127.0.0.1" }}</code>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <div class="mb-2"><i class="fa-solid fa-shield-halved fs-2 text-secondary"></i></div>
+                        No transaction or modification operations documented in the system audit registry.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

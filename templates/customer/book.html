@@ -1,0 +1,61 @@
+{% extends 'customer/base.html' %}
+{% block title %}Book Appointment{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card service-card p-4 p-md-5">
+            <h2 class="fw-bold mb-1">Book Appointment</h2>
+            <p class="text-muted mb-4">Select service, stylist, date and time</p>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Service</label>
+                    <select name="service_id" class="form-select" required>
+                        <option value="">Choose a service</option>
+                        {% for s in services %}
+                        <option value="{{ s.id }}">{{ s.name }} - Rs.{{ s.price }} ({{ s.duration }} min)</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Beautician (optional)</label>
+                    <select name="beautician_id" class="form-select">
+                        <option value="">Any available</option>
+                        {% for b in beauticians %}
+                        <option value="{{ b.id }}">{{ b.user.get_full_name|default:b.user.username }} - {{ b.specialty }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Date</label>
+                        <input type="date" name="date" class="form-control" min="{{ min_date }}" max="{{ max_date }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Time</label>
+                        <input type="time" name="time" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Phone</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="+91 XXXXX XXXXX">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Promo Code</label>
+                    <input type="text" name="promo_code" class="form-control" placeholder="Optional">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Notes</label>
+                    <textarea name="notes" class="form-control" rows="2" placeholder="Special requests"></textarea>
+                </div>
+                <div class="form-check mb-4">
+                    <input class="form-check-input" type="checkbox" name="pay_now" id="pay_now" checked>
+                    <label class="form-check-label" for="pay_now">Pay now with Stripe (secure card payment)</label>
+                </div>
+                <button type="submit" class="btn btn-beauty btn-lg w-100">Confirm Booking</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

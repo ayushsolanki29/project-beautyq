@@ -1,0 +1,73 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-white">
+            <h4 class="mb-0">
+                {% if object %}Edit Service{% else %}Add New Service{% endif %}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">Service Name </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                    <div class="text-danger small">{{ form.name.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_duration" class="form-label">Duration (minutes)</label>
+                        {{ form.duration }}
+                        {% if form.duration.errors %}
+                        <div class="text-danger small">{{ form.duration.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_price" class="form-label">Price (₹) </label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                        <div class="text-danger small">{{ form.price.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                </div>
+                <div class="mb-3">
+                    <label for="id_category" class="form-label">Category </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <div class="text-danger small">{{ form.category.errors }}</div>
+                    {% endif %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_image" class="form-label">Service Image</label>
+                    {{ form.image }}
+                    {% if object.image %}
+                    <div class="mt-2">
+                        <img src="{{ object.image.url }}" alt="Current image" class="rounded" width="100">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'all_services' %}" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}Update{% else %}Create{% endif %} Service
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

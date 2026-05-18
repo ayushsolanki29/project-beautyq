@@ -1,0 +1,96 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<nav aria-label="breadcrumb" class="mb-2">
+  <ol class="breadcrumb bg-transparent p-0" style="font-size: 13px;">
+    <li class="breadcrumb-item"><a href="{% url 'admin_dashboard' %}" class="text-decoration-none">Home</a></li>
+    <li class="breadcrumb-item text-muted">Finance & Payouts</li>
+    <li class="breadcrumb-item active fw-semibold text-dark" aria-current="page">Transaction Logs</li>
+  </ol>
+</nav>
+
+<div class="mb-4">
+    <h2 class="fw-bold mb-1" style="color: #08142f;">System Transaction Ledger</h2>
+    <p class="text-muted small mb-0">Audit real-time payment gateway flows, channel tracking tokens, and platform collection histories.</p>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Gross Settled Collections</small>
+            <h3 class="fw-bold m-0 text-success">₹{{ success_volume|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Failed Processing Hits</small>
+            <h3 class="fw-bold m-0 text-danger">{{ failed_count }} Transactions</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="p-3 bg-white border rounded shadow-sm">
+            <small class="text-muted fw-semibold d-block mb-1 text-uppercase" style="font-size: 11px; letter-spacing: 0.5px;">Total Audit Logs Tracked</small>
+            <h3 class="fw-bold m-0" style="color: #08142f;">{{ total_logs_count }} Records</h3>
+        </div>
+    </div>
+</div>
+
+<div class="chart-container-wrapper p-4 bg-white border rounded shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle m-0" style="font-size: 14px;">
+            <thead class="table-light">
+                <tr>
+                    <th>Timestamp Token</th>
+                    <th>Transaction / Reference ID</th>
+                    <th>Customer Profile</th>
+                    <th>Beneficiary Parlour</th>
+                    <th>Amount Paid</th>
+                    <th>Method</th>
+                    <th class="text-center">Gateway Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td class="text-muted" style="font-size: 13px;">
+                        {{ log.timestamp|date:"d M Y, h:i A" }}
+                    </td>
+                    <td>
+                        <code class="text-dark bg-light px-2 py-1 rounded fw-bold" style="font-size: 12px;">{{ log.transaction_id }}</code>
+                    </td>
+                    <td class="fw-semibold" style="color: #08142f;">
+                        {{ log.customer.username }}
+                    </td>
+                    <td>
+                        <span class="text-secondary"><i class="fa-solid fa-store me-1 small"></i>{{ log.parlour.name }}</span>
+                    </td>
+                    <td class="fw-bold text-dark">
+                        {% if log.status == 'Success' %}+{% endif %}₹{{ log.amount }}
+                    </td>
+                    <td class="text-muted small">
+                        {{ log.payment_method }}
+                    </td>
+                    <td class="text-center">
+                        {% if log.status == 'Success' %}
+                            <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="border-radius: 6px; font-size: 12px; min-width: 80px;">Success</span>
+                        {% elif log.status == 'Failed' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="border-radius: 6px; font-size: 12px; min-width: 80px;">Failed</span>
+                        {% else %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1" style="border-radius: 6px; font-size: 12px; min-width: 80px;">Refunded</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <div class="mb-2"><i class="fa-solid fa-receipt fs-2 text-secondary"></i></div>
+                        No payment gateway log streams detected in the system history registry.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

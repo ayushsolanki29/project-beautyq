@@ -1,0 +1,65 @@
+{% extends 'parlour/base.html' %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Duty Roster</h2>
+    <a href="{% url 'duty_add' %}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Assign Shift
+    </a>
+</div>
+
+<!-- Week Navigation -->
+<div class="d-flex justify-content-between mb-3">
+    <a href="?week={{ prev_week|date:'Y-m-d' }}" class="btn btn-outline-secondary">
+        <i class="fas fa-chevron-left"></i> Previous Week
+    </a>
+    <span class="fw-bold">
+        Week of {{ current_week_start|date:"M d, Y" }}
+    </span>
+    <a href="?week={{ next_week|date:'Y-m-d' }}" class="btn btn-outline-secondary">
+        Next Week <i class="fas fa-chevron-right"></i>
+    </a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>no.</th>
+                <th>Staff</th>
+                {% for date in week_dates %}
+                    <th>{{ date|date:"D, M d" }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for staff in staff_members %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="fw-bold">{{ staff.first_name }} {{ staff.last_name }}</td>
+                {% for date in week_dates %}
+                    <td>
+                        {% for duty in roster_matrix|get_item:staff.id|get_item:date %}
+                            <div class="border rounded p-1 mb-1 bg-light">
+                                <small><strong>{{ duty.start_time|time:"H:i" }} – {{ duty.end_time|time:"H:i" }}</strong></small><br>
+                                <small>{{ duty.role }}</small><br>
+                                <a href="{% url 'duty_delete' duty.id %}" class="text-danger small" onclick="return confirm('Remove this shift?')">
+                                    <i class="fas fa-trash"></i> Remove
+                                </a>
+                            </div>
+                        {% empty %}
+                            <span class="text-muted">—</span>
+                        {% endfor %}
+                    </td>
+                {% endfor %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center">No staff members found. <a href="{% url 'staff_add' %}">Add staff first</a>.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

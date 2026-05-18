@@ -1,0 +1,138 @@
+{% extends 'Admin/base.html' %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="fw-bold h3 mb-1">Dashboard Overview</h1>
+        <p class="text-muted mb-0">System-wide analytics for BeautyQ PRO.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <span class="badge bg-success-subtle text-success px-3 py-2" style="border-radius: 10px;">
+            <i class="fa-solid fa-circle fa-2xs me-1"></i> System Online
+        </span>
+    </div>
+</div>
+
+<div class="dashboard-stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon icon-blue"><i class="fa-solid fa-wallet"></i></div>
+            <span class="stat-label">TOTAL REVENUE</span>
+        </div>
+        <div class="stat-value">${{ revenue|floatformat:2 }}</div>
+        <div class="stat-footer text-success"><i class="fa-solid fa-arrow-up"></i> Live Data</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon icon-purple"><i class="fa-solid fa-calendar-check"></i></div>
+            <span class="stat-label">ACTIVE BOOKINGS</span>
+        </div>
+        <div class="stat-value">{{ bookings }}</div>
+        <div class="stat-footer text-muted">Awaiting fulfillment</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon icon-orange"><i class="fa-solid fa-scissors"></i></div>
+            <span class="stat-label">TOTAL SERVICES</span>
+        </div>
+        <div class="stat-value">{{ services }}</div>
+        <div class="stat-footer text-muted">Across all categories</div>
+    </div>
+
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-icon icon-green"><i class="fa-solid fa-user-group"></i></div>
+            <span class="stat-label">TOTAL USERS</span>
+        </div>
+        <div class="stat-value">{{ users }}</div>
+        <div class="stat-footer text-muted">Registered customers</div>
+    </div>
+</div>
+
+<div class="chart-container-wrapper">
+    <div class="chart-header">
+        <h5 class="fw-bold mb-0">Revenue Trend</h5>
+        <div class="d-flex align-items-center gap-2">
+            <span class="legend-dot"></span><small class="text-muted">Monthly Earnings</small>
+        </div>
+    </div>
+    <div style="height: 300px;">
+        <canvas id="revenueChart"></canvas>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-8 mb-4">
+        <div class="chart-container-wrapper h-100">
+            <h5 class="fw-bold mb-4">Recent Transactions</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Parlour</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for b in recent_bookings %}
+                        <tr>
+                            <td class="fw-bold">#{{ b.id }}</td>
+                            <td>{{ b.parlour.name }}</td>
+                            <td>${{ b.amount }}</td>
+                            <td>
+                                <span class="badge {% if b.status == 'Completed' %}bg-success-subtle text-success{% else %}bg-primary-subtle text-primary{% endif %}">
+                                    {{ b.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">No records found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="chart-container-wrapper mb-4">
+            <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size: 11px;">Verification Queue</h6>
+            {% for p in verification_queue %}
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <div>
+                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ p.name }}</p>
+                    <small class="text-muted" style="font-size: 11px;">Joined {{ p.created_at|date:"d M" }}</small>
+                </div>
+                <a href="#" class="btn btn-sm btn-primary py-0 px-2" style="font-size: 11px;">Review</a>
+            </div>
+            {% empty %}
+            <p class="text-muted small">No pending verifications.</p>
+            {% endfor %}
+        </div>
+
+        <div class="chart-container-wrapper">
+            <h6 class="fw-bold mb-3 text-uppercase text-muted" style="font-size: 11px;">Top Performers</h6>
+            {% for top in top_parlours %}
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div class="bg-navy text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" 
+                     style="width: 32px; height: 32px; font-size: 12px; background: #08142f;">
+                    {{ forloop.counter }}
+                </div>
+                <div>
+                    <p class="mb-0 fw-semibold" style="font-size: 14px;">{{ top.name }}</p>
+                    <small class="text-muted" style="font-size: 11px;">{{ top.num_bookings }} bookings</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

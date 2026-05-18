@@ -1,0 +1,48 @@
+{% extends 'Admin/base.html' %}
+{% block content %}
+
+<div class="mb-4">
+    <h2 class="fw-bold">Platform Analytics</h2>
+    <p class="text-muted">Visualizing business growth and parlour performance.</p>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-8">
+        <div class="chart-container-wrapper">
+            <h5 class="fw-bold mb-3">Revenue Growth (Annual)</h5>
+            <div style="height: 350px;">
+                <canvas id="analyticsLineChart" 
+                        data-labels='{{ chart_labels|safe }}' 
+                        data-values='{{ chart_data|safe }}'></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="chart-container-wrapper">
+            <h5 class="fw-bold mb-3">Market Share</h5>
+            <div style="height: 350px;">
+                <canvas id="analyticsPieChart" 
+                        data-labels='{{ pie_labels|safe }}' 
+                        data-values='{{ pie_data|safe }}'></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold">AVG. BOOKING VALUE</span>
+            <h3 class="fw-bold">${{ avg_val|floatformat:2 }}</h3>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="stat-card">
+            <span class="text-muted small fw-bold">PROJECTED REVENUE</span>
+            <h3 class="fw-bold">${{ total_revenue|floatformat:0 }}</h3>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

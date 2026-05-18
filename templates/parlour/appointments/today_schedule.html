@@ -1,0 +1,52 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <h2 class="mb-4"><i class="fa-solid fa-calendar-day me-2"></i>Today's Schedule - {% now "F d, Y" %}</h2>
+
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Time</th>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Beautician</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.time|time:"H:i" }}</td>
+                    <td>
+                        <strong>{{ appt.customer_name }}</strong><br>
+                        <small>{{ appt.customer_phone }}</small>
+                    </td>
+                    <td>{{ appt.service.name }}</td>
+                    <td>{{ appt.beautician.user.get_full_name|default:"Not assigned" }}</td>
+                    <td>
+                        {% if appt.status == 'pending' %}
+                            <span class="badge bg-warning text-dark">Pending</span>
+                        {% elif appt.status == 'confirmed' %}
+                            <span class="badge bg-success">Confirmed</span>
+                        {% elif appt.status == 'completed' %}
+                            <span class="badge bg-info">Completed</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i> Update</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No appointments scheduled for today.</div>
+    {% endif %}
+</div>
+{% endblock %}

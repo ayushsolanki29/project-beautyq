@@ -1,0 +1,45 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <h2 class="mb-4"><i class="fa-solid fa-bell me-2"></i>New Appointment Requests</h2>
+
+    {% if appointments %}
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Customer</th>
+                    <th>Service</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Requested On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>
+                        <strong>{{ appt.customer_name }}</strong><br>
+                        <small>{{ appt.customer_phone }}<br>{{ appt.customer_email }}</small>
+                    </td>
+                    <td>{{ appt.service.name }}</td>
+                    <td>{{ appt.date|date:"M d, Y" }}</td>
+                    <td>{{ appt.time|time:"H:i" }}</td>
+                    <td>{{ appt.created_at|date:"M d, H:i" }}</td>
+                    <td>
+                        <a href="#" class="btn btn-sm btn-success"><i class="fas fa-check"></i> Confirm</a>
+                        <a href="#" class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Decline</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">No pending appointment requests.</div>
+    {% endif %}
+</div>
+{% endblock %}

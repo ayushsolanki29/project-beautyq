@@ -1,0 +1,72 @@
+{% extends 'parlour/base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <h2 class="fw-bold mb-4">🛠 Support Desk</h2>
+            
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body">
+                    <h5 class="fw-bold"><i class="fas fa-question-circle me-2"></i> Frequently Asked Questions</h5>
+                    <div class="accordion mt-3" id="faqAccordion">
+                        {% for item in faq_items %}
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq{{forloop.counter}}">
+                                    {{ item.q }}
+                                </button>
+                            </h2>
+                            <div id="faq{{forloop.counter}}" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body text-muted">{{ item.a }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3">Your Support Tickets</h5>
+            {% for ticket in tickets %}
+            <div class="card mb-2 border-0 shadow-sm">
+                <div class="card-body d-flex justify-content-between align-items-center">
+                    <div>
+                        <span class="badge {% if 'Resolved' in ticket.subject %}bg-success{% else %}bg-warning{% endif %} me-2">
+                            Ticket #{{ ticket.id }}
+                        </span>
+                        <strong>{{ ticket.subject }}</strong>
+                        <div class="small text-muted mt-1">{{ ticket.body|truncatewords:10 }}</div>
+                    </div>
+                    <div class="text-end">
+                        <small class="d-block text-muted">{{ ticket.created_at|date:"M d" }}</small>
+                        <a href="{% url 'message_center' %}" class="btn btn-sm btn-outline-primary mt-1">View Chat</a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-muted">You haven't raised any support tickets yet.</p>
+            {% endfor %}
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-primary text-white border-0 shadow-sm mb-4">
+                <div class="card-body p-4 text-center">
+                    <i class="fas fa-headset fa-3x mb-3"></i>
+                    <h4>Need Help?</h4>
+                    <p class="small">Our team is available Mon-Fri, 9am - 6pm.</p>
+                    <a href="{% url 'message_center' %}" class="btn btn-light w-100 fw-bold">
+                        Create New Ticket
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold text-uppercase small text-muted">Emergency Contact</h6>
+                    <p class="mb-1"><i class="fas fa-phone me-2"></i> +91 98765 43210</p>
+                    <p class="mb-0"><i class="fas fa-envelope me-2"></i> support@beautyq.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

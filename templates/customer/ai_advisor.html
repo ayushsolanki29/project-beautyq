@@ -1,0 +1,42 @@
+{% extends 'customer/base.html' %}
+
+{% block title %}AI Beauty Advisor{% endblock %}
+
+{% block content %}
+
+<div class="ai-box">
+
+    <h2 class="fw-bold mb-2"><i class="fa-solid fa-wand-magic-sparkles text-danger"></i> AI Beauty Advisor</h2>
+
+    <p class="text-muted mb-4">Powered by Google Gemini. Ask about hairstyles, skincare, nail care, or salon services.</p>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <textarea name="prompt" class="form-control mb-3" rows="4" placeholder="e.g. What haircut suits round face shape?" required>{% if request.method == 'POST' %}{{ request.POST.prompt }}{% endif %}</textarea>
+
+        <button type="submit" class="btn btn-beauty">Get AI Advice</button>
+
+    </form>
+
+    {% if advice %}
+
+    <div class="card mt-4 p-4 border-0 shadow-sm{% if advice_is_error %} border-warning bg-warning-subtle{% endif %}">
+
+        <h6 class="fw-bold {% if advice_is_error %}text-warning-emphasis{% else %}text-danger{% endif %} mb-2">
+
+            {% if advice_is_error %}<i class="fa-solid fa-circle-exclamation"></i> {% endif %}BeautyQ AI says:
+
+        </h6>
+
+        <p class="mb-0" style="white-space: pre-wrap;">{{ advice }}</p>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
+

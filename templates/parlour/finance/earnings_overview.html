@@ -1,0 +1,82 @@
+{% extends 'parlour/base.html' %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>🏢 Parlour Earnings Performance</h2>
+    <hr>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Total Sales (Gross)</h6>
+                    <h2 class="text-primary">${{ total_revenue }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Staff Payouts (Expense)</h6>
+                    <h2 class="text-danger">-${{ total_staff_paid }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-success shadow">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">Parlour Net Profit</h6>
+                    <h2 class="text-success">${{ parlour_profit }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-white font-weight-bold">
+            Recent Parlour Earnings
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Customer</th>
+                        <th>Date</th>
+                        <th class="text-right">Earnings</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in recent_appointments %}
+                    <tr>
+                        <td>{{ appt.service.name }}</td>
+                        <td>{{ appt.customer_name }}</td>
+                        <td>{{ appt.date|date:"M d, Y" }}</td>
+                        <td class="text-right text-success font-weight-bold">
+                            +${{ appt.service.price }} </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No completed services yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="list-group shadow-sm">
+            <div class="list-group-item bg-light font-weight-bold">Reports & Payouts</div>
+            <a href="#" class="list-group-item list-group-item-action">Download Monthly Report (PDF)</a>
+            <a href="{% url 'payout_periods' %}" class="list-group-item list-group-item-action">View Payout
+                History</a>
+            <a href="#" class="list-group-item list-group-item-action text-primary">Request Manual Payout</a>
+        </div>
+    </div>
+</div>
+</div>
+{% endblock %}

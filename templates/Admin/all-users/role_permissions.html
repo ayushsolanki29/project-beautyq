@@ -1,0 +1,61 @@
+{% extends 'Admin/base.html' %}
+
+{% block content %}
+
+<div class="mb-4">
+    <h2 class="fw-bold" style="color: #08142f;">Role Permissions Management</h2>
+    <p class="text-muted">Configure granular access control switches for system roles.</p>
+</div>
+
+<div class="chart-container-wrapper mb-4 p-4">
+    <div class="row align-items-center">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold text-dark">Select Role to Configure</label>
+            <select class="form-select" id="roleSelector" onchange="changeRoleView(this.value)">
+                {% for code, name in role_choices %}
+                    <option value="{{ code }}" {% if selected_role == code %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<div class="chart-container-wrapper">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Category</th>
+                    <th>Module/Feature</th>
+                    <th>Permission Codename</th>
+                    <th class="text-center">Toggle Switch</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for perm in permissions %}
+                <tr>
+                    <td class="fw-semibold text-secondary">{{ perm.module_name }}</td>
+                    <td class="fw-bold" style="color: #08142f;">{{ perm.feature_name }}</td>
+                    <td><code>{{ perm.codename }}</code></td>
+                    <td class="text-center">
+                        <div class="form-check form-switch d-inline-block">
+                            <input class="form-check-input" type="checkbox" role="switch" 
+                                   data-perm-id="{{ perm.id }}"
+                                   {% if perm.is_allowed %}checked{% endif %}
+                                   onchange="togglePermissionState(this)">
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">
+                        No permissions found. Please populate your database records.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

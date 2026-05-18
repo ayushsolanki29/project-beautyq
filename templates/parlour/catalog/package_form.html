@@ -1,0 +1,69 @@
+{% extends 'parlour/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 700px;">
+        <div class="card-header bg-white">
+            <h4 class="mb-0">
+                {% if object %}Edit Package{% else %}Create New Package{% endif %}
+            </h4>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_name" class="form-label">Package Name *</label>
+                    {{ form.name }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_description" class="form-label">Description</label>
+                    {{ form.description }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_services" class="form-label">Select Services *</label>
+                    {{ form.services }}
+                    <small class="text-muted">Hold Ctrl (or Cmd) to select multiple services</small>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="id_original_price" class="form-label">Original Price (₹) *</label>
+                        {{ form.original_price }}
+                        <small class="text-muted">Sum of individual service prices</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="id_package_price" class="form-label">Package Price (₹) *</label>
+                        {{ form.package_price }}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_image" class="form-label">Package Image</label>
+                    {{ form.image }}
+                    {% if object.image %}
+                        <div class="mt-2">
+                            <img src="{{ object.image.url }}" alt="Current" class="rounded" width="100">
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3 form-check">
+                    {{ form.is_active }}
+                    <label for="id_is_active" class="form-check-label">Active (visible to customers)</label>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'all_packages' %}" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        {% if object %}Update{% else %}Create{% endif %} Package
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

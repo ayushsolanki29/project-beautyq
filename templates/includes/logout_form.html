@@ -1,0 +1,7 @@
+<form method="post" action="{% url 'logout' %}" class="logout-form{% if form_class %} {{ form_class }}{% endif %}">
+    {% csrf_token %}
+    <button type="submit" class="{{ button_class|default:'btn btn-link p-0' }}">
+        {% if icon %}<i class="{{ icon }}"></i>{% endif %}
+        {% if label %}<span{% if span_class %} class="{{ span_class }}"{% endif %}>{{ label }}</span>{% endif %}
+    </button>
+</form>

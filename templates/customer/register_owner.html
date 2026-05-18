@@ -1,0 +1,45 @@
+{% extends 'customer/base.html' %}
+{% block title %}Owner Registration{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    
+    <div class="col-md-6">
+        <div class="card service-card p-4">
+            <h3 class="fw-bold text-center mb-4">Parlour Owner Registration</h3>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required minlength="8">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parlour Name</label>
+                    <input type="text" name="parlour_name" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Contact Number</label>
+                    <input type="tel" name="contact" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <textarea name="address" class="form-control" rows="2" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-beauty w-100">Register Parlour</button>
+            </form>
+            <p class="text-center mt-3 small"><a href="{% url 'register_customer' %}">Register as Customer</a> | <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

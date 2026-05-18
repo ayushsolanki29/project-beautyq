@@ -1,0 +1,23 @@
+{% extends 'parlour/base.html' %}
+
+{% block content %}
+<div class="container-fluid p-4">
+    <div class="card shadow-sm mx-auto" style="max-width: 500px;">
+        <div class="card-header bg-white text-danger">
+            <h4 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Delete</h4>
+        </div>
+        <div class="card-body">
+            <p>Are you sure you want to delete the package <strong>"{{ object.name }}"</strong>?</p>
+            <p class="text-muted small">This action cannot be undone.</p>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'all_packages' %}" class="btn btn-light">Cancel</a>
+                    <button type="submit" class="btn btn-danger">Delete Package</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'parlour/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold text-dark">⭐ Customer Feedback</h2>
+            <p class="text-muted">Direct reviews from your clients regarding services provided.</p>
+        </div>
+        <div class="text-end bg-light p-3 rounded shadow-sm">
+            <h3 class="mb-0 text-warning fw-bold">{{ average_rating|floatformat:1 }} / 5.0</h3>
+            <small class="text-muted text-uppercase fw-bold">Based on {{ total_reviews }} Reviews</small>
+        </div>
+    </div>
+
+    <hr>
+
+    {% if error %}
+    <div class="alert alert-danger shadow-sm" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <div class="row mt-4">
+        {% for review in reviews %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="text-warning">
+                                {% with ''|center:review.rating as range %}
+                                {% for _ in range %}
+                                    <i class="fas fa-star"></i>
+                                {% endfor %}
+                                {% endwith %}
+                                
+                                {% with 5|add:review.rating|stringformat:"s" as diff %}
+                                {% endwith %}
+                            </span>
+                        </div>
+                        <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                    </div>
+
+                    <h5 class="card-title fw-bold mb-1">
+                        {{ review.appointment.customer_name|default:"Valued Customer" }}
+                    </h5>
+                    <div class="mb-3">
+                        <span class="badge bg-info text-dark">Service: {{ review.appointment.service.name }}</span>
+                        <span class="badge bg-secondary">Staff: {{ review.appointment.beautician.user.get_full_name }}</span>
+                    </div>
+
+                    <p class="card-text text-dark italic">
+                        "{{ review.comment|default:"No written feedback provided, but the customer gave a star rating." }}"
+                    </p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-end pb-3">
+                    <small class="text-muted">Appointment ID: #{{ review.appointment.id }}</small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <div class="mb-3">
+                <i class="fas fa-comment-slash fa-4x text-light"></i>
+            </div>
+            <h4 class="text-muted">No Reviews Yet</h4>
+            <p class="text-secondary">When customers rate your staff's services, they will appear here.</p>
+            <a href="{% url 'earnings_overview' %}" class="btn btn-outline-primary mt-3">Return to Dashboard</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .italic { font-style: italic; color: #555; }
+    .card { transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); }
+</style>
+{% endblock %}

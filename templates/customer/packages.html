@@ -1,0 +1,31 @@
+{% extends 'customer/base.html' %}
+{% block title %}Packages{% endblock %}
+{% block content %}
+<h2 class="fw-bold mb-4">Service Packages</h2>
+<div class="row g-4">
+    {% for pkg in packages %}
+    <div class="col-md-6">
+        <div class="card service-card p-4 h-100">
+            <h4 class="fw-bold">{{ pkg.name }}</h4>
+            <p class="text-muted">{{ pkg.description }}</p>
+            <ul class="small text-muted">
+                {% for s in pkg.services.all %}
+                <li>{{ s.name }} - Rs.{{ s.price }}</li>
+                {% endfor %}
+            </ul>
+            <div class="d-flex justify-content-between align-items-end mt-3">
+                
+                <div>
+                    <span class="badge bg-danger fs-6">{{ pkg.discount_percentage }}% OFF</span>
+                    <div class="fw-bold text-danger fs-4">Rs.{{ pkg.package_price }}</div>
+                    <small class="text-muted text-decoration-line-through">Rs.{{ pkg.original_price }}</small>
+                </div>
+                <a href="{% url 'book_appointment' %}" class="btn btn-beauty">Book Package</a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">No packages available yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

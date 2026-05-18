@@ -1,0 +1,408 @@
+/* ===== Google Font ===== */
+@import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap');
+
+/* ===== Admin Color Variables Integrated ===== */
+:root {
+    --bg-wash: #f1f5f9;
+    --navy: #08142f;
+    --sidebar-white: #ffffff;
+    --text-muted: #64748b;
+    --sidebar-width: 290px;
+    --sidebar-mini: 90px;
+    --navbar-height: 70px;
+    --transition: all 0.35s ease;
+}
+
+/* ===== Reset ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Raleway', sans-serif; /* Kept your font configuration */
+    background: var(--bg-wash);
+    color: #212121;
+}
+
+/* ===== TOPBAR (ADMIN SPECIFICATION) ===== */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--navbar-height);
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    z-index: 1000;
+}
+
+.logo {
+    font-size: 1.4rem; /* Font sizes protected */
+    font-weight: 700;
+    color: #111827;
+}
+
+.menu-btn {
+    background: #f1f5f9;
+    border: none;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #475569;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menu-btn:hover {
+    background: #e2e8f0;
+}
+
+/* ===== MAIN LAYOUT CONTAINER ===== */
+.main-container {
+    display: flex;
+    gap: 18px;
+    padding: 18px;
+    margin-top: var(--navbar-height);
+    height: calc(100vh - var(--navbar-height));
+}
+
+/* ===== SIDEBAR CONTAINER (MATCHES ADMIN PHOTO) ===== */
+.sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    background: #ffffff;
+    height: 100%; /* Adapts flawlessly to the clean separate box layout */
+    position: static; /* Removes absolute positioning to sit inside lower-layout nicely */
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: var(--transition);
+    z-index: 999;
+    border-radius: 28px;
+    padding: 22px 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    flex-shrink: 0;
+    border-right: none;
+}
+
+/* ===== COLLAPSED SIDEBAR RULES ===== */
+.sidebar.collapsed {
+    width: var(--sidebar-mini) !important;
+    min-width: var(--sidebar-mini) !important;
+}
+
+.sidebar.collapsed .sidebar-brand h4 {
+    font-size: 0;
+}
+
+.sidebar.collapsed .sidebar-brand h4::after {
+    content: "BQ";
+    font-size: 28px; /* Safe micro-fallback size for icon replacement */
+    font-weight: 800;
+    color: #111827;
+}
+
+.sidebar.collapsed span,
+.sidebar.collapsed .arrow,
+.sidebar.collapsed .dropdown-container,
+.sidebar.collapsed .sidebar-brand small {
+    display: none !important;
+}
+
+.sidebar.collapsed .nav-link, 
+.sidebar.collapsed .dropdown-btn {
+    justify-content: center;
+    padding: 15px;
+    gap: 0;
+    margin: 0 0 8px 0;
+    width: 100%;
+}
+
+/* ===== BRAND ===== */
+.sidebar-brand {
+    padding: 10px 10px 25px;
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.sidebar-brand h4 {
+    font-size: 1.7rem; /* Font sizes protected */
+    font-weight: 800;
+    color: #111827;
+    white-space: nowrap;
+}
+
+.text-primary {
+    color: #2563eb !important;
+}
+
+.text-sm {
+    font-size: 0.72rem; /* Font sizes protected */
+    font-weight: 700;
+}
+
+/* ===== NAV LINKS & DROPDOWN BUTTONS (ADMIN STYLE CODES) ===== */
+.nav-link, .dropdown-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+    color: #94a3b8; /* Muted slate gray text from Admin */
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    border-radius: 18px;
+    font-size: 0.95rem; /* Font sizes protected */
+    font-weight: 500;
+    width: 100%;
+    cursor: pointer;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.nav-link i, .dropdown-btn i {
+    min-width: 22px;
+    font-size: 1rem; /* Font sizes protected */
+    text-align: center;
+    color: #94a3b8;
+}
+
+/* Hover Adjustments */
+.nav-link:hover, .dropdown-btn:hover {
+    background: #f4f7ff;
+    color: #111827;
+}
+
+.nav-link:hover i, .dropdown-btn:hover i {
+    color: #3b82f6; /* Sleek admin accent blue response color */
+}
+
+/* Active Highlight (Navy Background Block Layout) */
+.nav-link.active, .nav-link-custom.active {
+    background: var(--navy) !important;
+    color: #ffffff !important;
+    box-shadow: 0 12px 20px rgba(8, 20, 47, 0.15);
+    border-radius: 8px; /* Snaps to flat-admin accent layout style when selected */
+}
+
+.nav-link.active i, .nav-link-custom.active i {
+    color: #ffffff !important;
+}
+
+/* Dropdown Arrow controls */
+.dropdown-btn .arrow {
+    margin-left: auto;
+    transition: 0.3s;
+}
+
+.dropdown-btn.active .arrow {
+    transform: rotate(180deg);
+}
+
+/* ===== DROPDOWN CONTAINERS ===== */
+.dropdown-container {
+    display: none;
+    padding-left: 12px;
+    margin-top: -2px;
+    margin-bottom: 8px;
+}
+
+.dropdown-container a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 14px;
+    border-radius: 14px;
+    color: #64748b;
+    font-size: 0.88rem; /* Font sizes protected */
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 5px;
+    transition: 0.3s;
+    white-space: nowrap;
+}
+
+.dropdown-container a:hover {
+    color: #00273c;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding-left: 20px; /* Admin micro-slide effect kept */
+}
+
+.dropdown-container a.active, .dropdown-container a.active-child {
+    color: #3b82f6 !important;
+    font-weight: 600;
+    background-color: rgba(59, 130, 246, 0.08);
+}
+
+.dropdown-container a.active i, .dropdown-container a.active-child i {
+    color: #3b82f6 !important;
+}
+
+/* ===== LOGOUT LINK ===== */
+.nav-link.text-danger, .logout-link {
+    color: #ef4444 !important;
+    margin-top: 20px;
+}
+
+.nav-link.text-danger i, .logout-link i {
+    color: #ef4444 !important;
+}
+
+.nav-link.text-danger:hover, .logout-link:hover {
+    background: #fff1f1 !important;
+}
+
+/* ===== MAIN CONTENT WORKSPACE BOX ===== */
+.content, .main-content {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 30px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin-left: 0; /* Unnecessary now that it is wrapped dynamically by the flexible main layout container */
+    min-width: 0;
+    transition: var(--transition);
+}
+
+.content-inner {
+    padding: 0; /* Padding moved elegantly to structural container */
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+/* ================= DASHBOARD COMPONENTS ================= */
+.dashboard-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    border: 1px solid #f1f5f9;
+}
+
+.stat-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px; /* Font sizes protected */
+}
+
+.icon-blue { background: #e0f2fe; color: #0ea5e9; }
+.icon-purple { background: #f3e8ff; color: #a855f7; }
+.icon-orange { background: #ffedd5; color: #f97316; }
+.icon-green { background: #dcfce7; color: #22c55e; }
+
+.stat-label {
+    font-size: 12px; /* Font sizes protected */
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.5px;
+}
+
+.stat-value {
+    font-size: 28px; /* Font sizes protected */
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.stat-footer {
+    font-size: 13px; /* Font sizes protected */
+    font-weight: 600;
+}
+
+.text-success { color: #10b981; }
+.text-muted { color: #94a3b8; font-weight: 400; }
+
+/* ===== CHARTS & CARDS ===== */
+.card, .chart-container-wrapper {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 24px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+    margin-top: 20px;
+}
+
+.card-header, .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    background: transparent;
+    border-bottom: none;
+    padding: 0;
+}
+
+.card-header h5, .chart-header h5 {
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: #3b82f6;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.chart-select, select, input, textarea {
+    padding: 5px 10px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    font-size: 13px; /* Font sizes protected */
+    color: #64748b;
+    outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 3px rgba(8, 20, 47, 0.08);
+}
+
+canvas, #revenueChart {
+    max-height: 350px;
+    width: 100% !important;
+}
+
+/* ===== SCROLLBAR ===== */
+.sidebar::-webkit-scrollbar, ::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb, ::-webkit-scrollbar-thumb {
+    background: #dbe3ec;
+    border-radius: 20px;
+}
+
+/* ===== MODAL FIXES ===== */
+.modal { z-index: 1055 !important; }
+.modal-backdrop { z-index: 1050 !important; }
